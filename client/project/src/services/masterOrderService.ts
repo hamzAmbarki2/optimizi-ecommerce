@@ -149,10 +149,28 @@ export const masterOrderService = {
 
         // Send confirmation email for each sub-order to the fournisseur
         try {
-          await emailService.sendOrderConfirmation({
-            ...subOrder,
-            id: subOrderRef.id
-          } as any); // Cast to Order for compatibility
+          // Format delivery address for email
+          const deliveryAddress = `${orderData.deliveryAddress.street}, ${orderData.deliveryAddress.city}, ${orderData.deliveryAddress.postalCode}, ${orderData.deliveryAddress.country}`;
+          
+          // Build items string for email template
+          const itemsString = orderItems
+            .map(i => `- ${i.quantity} x ${i.productName} — €${i.unitPrice.toFixed(2)}`)
+            .join('\n');
+
+          // Send order notification email to supplier
+          await emailService.sendOrderNotification({
+            userEmail: orderData.userEmail,
+            userName: orderData.userName,
+            orderId: subOrderRef.id,
+            status: 'pending',
+            total: fournisseurTotal,
+            itemCount: orderItems.length,
+            deliveryAddress: deliveryAddress,
+            paymentMethod: orderData.paymentMethod,
+            userPhone: orderData.userPhone,
+            orderNotes: orderData.orderNotes,
+            orderItemsString: itemsString
+          });
         } catch (emailError) {
           console.error('Failed to send sub-order confirmation email:', emailError);
           // Don't throw error for email failure, order creation should succeed
@@ -163,39 +181,6 @@ export const masterOrderService = {
       await updateDoc(doc(db, MASTER_ORDERS_COLLECTION, masterOrderId), {
         subOrderIds: subOrderIds
       });
-
-      // Send confirmation email for each sub-order to the supplier
-      try {
-        await emailService.sendOrderConfirmation({
-          ...masterOrder,
-          id: masterOrderId,
-          items: orderData.items.map(item => ({
-            productId: item.product.id,
-            productName: item.product.name,
-            productImage: item.product.imageURL,
-            quantity: item.quantity,
-            unitPrice: item.product.prixTTC,
-            totalPrice: item.product.prixTTC * item.quantity
-          })),
-          // Ensure optional fields are not undefined
-          promoCode: masterOrder.promoCode || undefined,
-        // Send order notification email to supplier
-        await emailService.sendOrderNotification({
-          userEmail: order.userEmail,
-          userName: order.userName,
-          orderId: subOrderRef.id,
-          status: 'pending',
-          total: fournisseurTotal,
-          itemCount: orderItems.length,
-          deliveryAddress: deliveryAddress,
-          paymentMethod: orderData.paymentMethod,
-          userPhone: orderData.userPhone,
-          orderNotes: orderData.orderNotes,
-          orderItemsString: itemsString
-        });
-      } catch (emailError) {
-        console.error('Failed to send master order confirmation email:', emailError);
-      }
 
       return masterOrderId;
     } catch (error) {

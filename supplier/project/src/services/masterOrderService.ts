@@ -155,11 +155,11 @@ export const masterOrderService = {
       
       console.log(`📊 [Fournisseur] SubOrder ${subOrderId} status change: ${previousStatus} → ${status}`);
       
-      // Check if we need to decrement stock (when status changes to "out_for_delivery")
-      const shouldDecrementStock = status === 'out_for_delivery' && previousStatus !== 'out_for_delivery';
+      // Check if we need to decrement stock (when status changes to "confirmed")
+      const shouldDecrementStock = status === 'confirmed' && previousStatus !== 'confirmed';
       
       if (shouldDecrementStock) {
-        console.log(`🔄 [Stock] Status changed to "out_for_delivery", decrementing stock for subOrder ${subOrderId}`);
+        console.log(`🔄 [Stock] Status changed to "confirmed", decrementing stock for subOrder ${subOrderId}`);
         
         // Prepare items for stock decrement
         const stockItems = currentSubOrder.items.map(item => ({
@@ -170,6 +170,8 @@ export const masterOrderService = {
         console.log(`📦 [Stock] Items to decrement:`, stockItems);
         
         // Decrement stock for all items in this sub-order
+        // Import ProductService dynamically to avoid circular dependency
+        const { ProductService } = await import('./productService');
         const stockResult = await ProductService.decrementMultipleProductsStock(stockItems);
         
         if (!stockResult.success) {
@@ -204,6 +206,7 @@ export const masterOrderService = {
       // Create notification for status change
       if (status !== currentSubOrder.status) {
         try {
+          const { EnhancedNotificationService } = await import('./enhancedNotificationService');
           await EnhancedNotificationService.createOrderNotification(
             currentSubOrder.fournisseurId,
             currentSubOrder.fournisseurName || 'Supplier',
@@ -218,6 +221,7 @@ export const masterOrderService = {
       // Create notification for payment status change
       if (paymentStatus && paymentStatus !== currentSubOrder.paymentStatus) {
         try {
+          const { EnhancedNotificationService } = await import('./enhancedNotificationService');
           await EnhancedNotificationService.createPaymentNotification(
             currentSubOrder.fournisseurId,
             currentSubOrder.fournisseurName || 'Supplier',

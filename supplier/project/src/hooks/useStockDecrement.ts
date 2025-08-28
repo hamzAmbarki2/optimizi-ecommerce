@@ -18,8 +18,9 @@ export const useStockDecrement = (fournisseurId: string | null) => {
       unsubscribeRef.current();
     }
 
-    // Initialize the stock decrement listener
-    unsubscribeRef.current = masterOrderService.initializeStockDecrementListener(fournisseurId);
+    // Initialize the stock decrement listener - we don't need this anymore since we handle it in the status update
+    // The stock decrement is now handled when order status changes to "confirmed"
+    console.log(`✅ [useStockDecrement] Stock decrement will be handled automatically when orders are confirmed`);
 
     // Cleanup function
     return () => {
