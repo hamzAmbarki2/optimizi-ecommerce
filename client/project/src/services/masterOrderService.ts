@@ -164,7 +164,7 @@ export const masterOrderService = {
         subOrderIds: subOrderIds
       });
 
-      // Send master order confirmation email to client
+      // Send confirmation email for each sub-order to the supplier
       try {
         await emailService.sendOrderConfirmation({
           ...masterOrder,
@@ -179,10 +179,20 @@ export const masterOrderService = {
           })),
           // Ensure optional fields are not undefined
           promoCode: masterOrder.promoCode || undefined,
-          orderNotes: masterOrder.orderNotes || undefined,
-          confirmedAt: undefined,
-          deliveredAt: undefined
-        } as any); // Cast to Order for compatibility
+        // Send order notification email to supplier
+        await emailService.sendOrderNotification({
+          userEmail: order.userEmail,
+          userName: order.userName,
+          orderId: subOrderRef.id,
+          status: 'pending',
+          total: fournisseurTotal,
+          itemCount: orderItems.length,
+          deliveryAddress: deliveryAddress,
+          paymentMethod: orderData.paymentMethod,
+          userPhone: orderData.userPhone,
+          orderNotes: orderData.orderNotes,
+          orderItemsString: itemsString
+        });
       } catch (emailError) {
         console.error('Failed to send master order confirmation email:', emailError);
       }

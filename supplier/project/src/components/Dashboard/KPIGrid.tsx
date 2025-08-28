@@ -179,7 +179,7 @@ const KPIGrid: React.FC<KPIGridProps> = ({ metrics, loading }) => {
       icon: <StarIcon className="h-8 w-8 text-white" />,
       gradient: 'bg-gradient-to-br from-yellow-500 to-yellow-600',
       description: 'Customer satisfaction',
-      hasDetails: true,
+      hasDetails: false,
       format: 'percentage' as const
     },
     {
@@ -191,7 +191,7 @@ const KPIGrid: React.FC<KPIGridProps> = ({ metrics, loading }) => {
       icon: <ExclamationTriangleIcon className="h-8 w-8 text-white" />,
       gradient: 'bg-gradient-to-br from-red-500 to-red-600',
       description: 'Products running low',
-      hasDetails: true
+      hasDetails: false
     },
     {
       id: 'gross-margin',
