@@ -4,6 +4,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { StockDecrementProvider } from './components/StockDecrementProvider';
+import { SupplierNotificationProvider } from './components/SupplierNotificationProvider';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout/Layout';
 import ToastContainer from './components/notifications/ToastContainer';
@@ -34,9 +35,11 @@ function App() {
             <Route path="/" element={
               <ProtectedRoute>
                 <StockDecrementProvider>
-                  <Layout>
-                    <Dashboard />
-                  </Layout>
+                  <SupplierNotificationProvider>
+                    <Layout>
+                      <Dashboard />
+                    </Layout>
+                  </SupplierNotificationProvider>
                 </StockDecrementProvider>
               </ProtectedRoute>
             } />
@@ -44,9 +47,11 @@ function App() {
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <StockDecrementProvider>
-                  <Layout>
-                    <Dashboard />
-                  </Layout>
+                  <SupplierNotificationProvider>
+                    <Layout>
+                      <Dashboard />
+                    </Layout>
+                  </SupplierNotificationProvider>
                 </StockDecrementProvider>
               </ProtectedRoute>
             } />
@@ -54,9 +59,11 @@ function App() {
             <Route path="/products" element={
               <ProtectedRoute>
                 <StockDecrementProvider>
-                  <Layout>
-                    <Products />
-                  </Layout>
+                  <SupplierNotificationProvider>
+                    <Layout>
+                      <Products />
+                    </Layout>
+                  </SupplierNotificationProvider>
                 </StockDecrementProvider>
               </ProtectedRoute>
             } />
@@ -64,9 +71,11 @@ function App() {
             <Route path="/categories" element={
               <ProtectedRoute>
                 <StockDecrementProvider>
-                  <Layout>
-                    <Categories />
-                  </Layout>
+                  <SupplierNotificationProvider>
+                    <Layout>
+                      <Categories />
+                    </Layout>
+                  </SupplierNotificationProvider>
                 </StockDecrementProvider>
               </ProtectedRoute>
             } />
@@ -74,9 +83,11 @@ function App() {
             <Route path="/orders" element={
               <ProtectedRoute>
                 <StockDecrementProvider>
-                  <Layout>
-                    <Orders />
-                  </Layout>
+                  <SupplierNotificationProvider>
+                    <Layout>
+                      <Orders />
+                    </Layout>
+                  </SupplierNotificationProvider>
                 </StockDecrementProvider>
               </ProtectedRoute>
             } />
@@ -84,9 +95,11 @@ function App() {
             <Route path="/notifications" element={
               <ProtectedRoute>
                 <StockDecrementProvider>
-                  <Layout>
-                    <Notifications />
-                  </Layout>
+                  <SupplierNotificationProvider>
+                    <Layout>
+                      <Notifications />
+                    </Layout>
+                  </SupplierNotificationProvider>
                 </StockDecrementProvider>
               </ProtectedRoute>
             } />
@@ -94,9 +107,11 @@ function App() {
             <Route path="/profile" element={
               <ProtectedRoute>
                 <StockDecrementProvider>
-                  <Layout>
-                    <Profile />
-                  </Layout>
+                  <SupplierNotificationProvider>
+                    <Layout>
+                      <Profile />
+                    </Layout>
+                  </SupplierNotificationProvider>
                 </StockDecrementProvider>
               </ProtectedRoute>
             } />
@@ -104,9 +119,11 @@ function App() {
             <Route path="/fournisseur" element={
               <ProtectedRoute>
                 <StockDecrementProvider>
-                  <Layout>
-                    <Fournisseur />
-                  </Layout>
+                  <SupplierNotificationProvider>
+                    <Layout>
+                      <Fournisseur />
+                    </Layout>
+                  </SupplierNotificationProvider>
                 </StockDecrementProvider>
               </ProtectedRoute>
             } />
@@ -114,9 +131,11 @@ function App() {
             <Route path="/email-test" element={
               <ProtectedRoute>
                 <StockDecrementProvider>
-                  <Layout>
-                    <EmailTest />
-                  </Layout>
+                  <SupplierNotificationProvider>
+                    <Layout>
+                      <EmailTest />
+                    </Layout>
+                  </SupplierNotificationProvider>
                 </StockDecrementProvider>
               </ProtectedRoute>
             } />
