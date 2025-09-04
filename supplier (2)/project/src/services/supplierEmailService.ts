@@ -380,8 +380,13 @@ export class SupplierEmailService {
    * Check if EmailJS is properly configured
    */
   public isConfigured(): boolean {
-  // Consider configured when backend URL is provided (or assume same origin)
-  return typeof this.backendUrl === 'string';
+    const configured = !!this.backendUrl;
+    console.log('🔍 [SupplierEmailService] Configuration check:', {
+      hasBackendUrl: !!this.backendUrl,
+      backendUrl: this.backendUrl,
+      configured
+    });
+    return configured;
   }
 
   /**
@@ -395,7 +400,7 @@ export class SupplierEmailService {
       isConfigured: missingFields.length === 0,
       missingFields,
       currentValues: {
-        backendUrl: this.backendUrl || 'same-origin'
+        backendUrl: this.backendUrl || 'http://localhost:4001 (default)'
       }
     };
   }
@@ -404,7 +409,9 @@ export class SupplierEmailService {
    * Test email sending with a mock order
    */
   public async sendTestEmail(supplierEmail: string, supplierName: string = 'Test Supplier'): Promise<boolean> {
-    if (!this.isInitialized) this.initialize();
+    this.initialize();
+    
+    console.log('🧪 [SupplierEmailService] Sending test email to:', supplierEmail);
 
     try {
       const template = ORDER_STATUS_TEMPLATES.pending;
@@ -424,6 +431,7 @@ export class SupplierEmailService {
       const personalizedSubject = template.subject.replace(/{orderNumber}/g, testOrderNumber);
 
       const url = `${this.backendUrl}/send-test-email`;
+      console.log('🔗 [SupplierEmailService] Posting test email to:', url);
 
       const resp = await fetch(url, {
         method: 'POST',
@@ -437,14 +445,15 @@ export class SupplierEmailService {
       });
 
       if (!resp.ok) {
-        console.error('Failed to send test email via backend', resp.status);
+        const errorText = await resp.text();
+        console.error('❌ [SupplierEmailService] Test email failed:', resp.status, errorText);
         return false;
       }
 
-      console.log('Test email posted to backend successfully');
+      console.log('✅ [SupplierEmailService] Test email sent successfully');
       return true;
     } catch (error) {
-      console.error('Test email error:', error);
+      console.error('❌ [SupplierEmailService] Test email error:', error);
       return false;
     }
   }

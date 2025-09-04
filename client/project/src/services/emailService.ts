@@ -118,7 +118,7 @@ const ORDER_STATUS_TEMPLATES: Record<string, OrderEmailTemplate> = {
 
 export class EmailService {
   private static instance: EmailService;
-  private backendUrl = import.meta.env.VITE_EMAIL_BACKEND_URL || '';
+  private backendUrl = import.meta.env.VITE_EMAIL_BACKEND_URL || 'http://localhost:4001';
   private isInitialized = false;
 
   private constructor() {}
@@ -131,11 +131,105 @@ export class EmailService {
   }
 
   /**
-   * Initialize the email service. Kept lightweight because backend-based sending requires no client SDK init.
+   * Initialize the email service and test backend connection
    */
-  public initialize(): void {
+  public async initialize(): Promise<void> {
+    console.log('🔄 [EmailService] Initializing email service...');
+    console.log('🔗 [EmailService] Backend URL:', this.backendUrl);
+    
+    // Test backend connection
+    try {
+      const response = await fetch(`${this.backendUrl}/health`);
+      if (response.ok) {
+        const health = await response.json();
+        console.log('✅ [EmailService] Backend connection successful:', health);
+        this.isInitialized = true;
+      } else {
+        console.error('❌ [EmailService] Backend health check failed:', response.status);
+        this.isInitialized = false;
+      }
+    } catch (error) {
+      console.error('❌ [EmailService] Cannot connect to email backend:', error);
+      console.log('💡 [EmailService] Make sure the email server is running on:', this.backendUrl);
+      this.isInitialized = false;
+    }
+  }
+
+  /**
+   * Check if the email service is ready to send emails
+   */
+  public async isReady(): Promise<boolean> {
+    if (!this.isInitialized) {
+      await this.initialize();
+    }
+    return this.isInitialized;
+  }
+
+  /**
+   * Test the email backend connection
+   */
+  public async testConnection(): Promise<{ success: boolean; message: string; details?: any }> {
+    try {
+      const response = await fetch(`${this.backendUrl}/health`);
+      if (response.ok) {
+        const health = await response.json();
+        return {
+          success: true,
+          message: 'Backend connection successful',
+          details: health
+        };
+      } else {
+        return {
+          success: false,
+          message: `Backend returned status ${response.status}`
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: `Cannot connect to backend: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
+  }
+
+  /**
+   * Send a test email
+   */
+  public async sendTestEmail(toEmail: string, subject: string = 'Test Email from Optimizi'): Promise<boolean> {
     this.isInitialized = true;
-    // No client-side SDK to initialize when using the backend email server.
+    
+    try {
+      const response = await fetch(`${this.backendUrl}/send-test-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to_email: toEmail,
+          subject,
+          message: `
+Test email sent at: ${new Date().toISOString()}
+
+This is a test email from the Optimizi client application.
+
+If you received this email, the email integration is working correctly!
+
+Best regards,
+Optimizi Team
+          `.trim()
+        })
+      });
+
+      if (response.ok) {
+        console.log('✅ [EmailService] Test email sent successfully');
+        return true;
+      } else {
+        const errorText = await response.text();
+        console.error('❌ [EmailService] Test email failed:', response.status, errorText);
+        return false;
+      }
+    } catch (error) {
+      console.error('❌ [EmailService] Test email error:', error);
+      return false;
+    }
   }
 
   /**
@@ -156,8 +250,16 @@ export class EmailService {
     items?: Array<{ name: string; quantity: number; unitPrice: number }>;
     orderItemsString?: string;
   }): Promise<boolean> {
-  try {
-      if (!this.isInitialized) this.initialize();
+    try {
+      if (!this.isInitialized) {
+        await this.initialize();
+      }
+      
+      if (!this.isInitialized) {
+        console.error('❌ [EmailService] Email service not initialized');
+        return false;
+      }
+      
       const template = ORDER_STATUS_TEMPLATES[orderData.status];
       if (!template) {
         console.error(`No email template found for status: ${orderData.status}`);
@@ -165,6 +267,13 @@ export class EmailService {
       }
 
       const orderNumber = orderData.orderId.slice(-8).toUpperCase();
+      
+      console.log('📧 [EmailService] Sending order notification:', {
+        to: orderData.userEmail,
+        orderNumber,
+        status: orderData.status,
+        total: orderData.total
+      });
       
       // Replace placeholders in the message
       const personalizedMessage = template.message
@@ -209,6 +318,8 @@ export class EmailService {
 
       // POST to backend email server
       const url = `${this.backendUrl}/send-email`;
+      console.log('🔗 [EmailService] Posting to backend:', url);
+      
       const resp = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -221,14 +332,15 @@ export class EmailService {
       });
 
       if (!resp.ok) {
-        console.error('Backend email send failed:', resp.status);
+        const errorText = await resp.text();
+        console.error('❌ [EmailService] Backend email send failed:', resp.status, errorText);
         return false;
       }
 
-      console.log('Order notification posted to backend successfully');
+      console.log('✅ [EmailService] Order notification posted to backend successfully');
       return true;
     } catch (error) {
-      console.error('Failed to send order notification email via backend:', error);
+      console.error('❌ [EmailService] Failed to send order notification:', error);
       return false;
     }
   }
@@ -244,6 +356,15 @@ export class EmailService {
     message: string;
   }): Promise<boolean> {
     try {
+      if (!this.isInitialized) {
+        await this.initialize();
+      }
+      
+      console.log('📧 [EmailService] Sending contact form email:', {
+        from: contactData.email,
+        subject: contactData.subject
+      });
+      
       const url = `${this.backendUrl}/send-email`;
       const resp = await fetch(url, {
         method: 'POST',
@@ -255,16 +376,23 @@ export class EmailService {
         })
       });
 
-      if (!resp.ok) return false;
+      if (!resp.ok) {
+        const errorText = await resp.text();
+        console.error('❌ [EmailService] Contact form email failed:', resp.status, errorText);
+        return false;
+      }
+      
+      console.log('✅ [EmailService] Contact form email sent successfully');
       return true;
     } catch (error) {
-      console.error('Failed to send contact form email via backend:', error);
+      console.error('❌ [EmailService] Contact form email error:', error);
       return false;
     }
   }
 
   // Convenience wrapper called by masterOrderService when creating the master order
   public async sendOrderConfirmation(order: any): Promise<boolean> {
+    console.log('📧 [EmailService] Sending order confirmation for order:', order.id);
     return this.sendOrderNotification({
       userEmail: order.userEmail,
       userName: order.userName,
@@ -280,6 +408,7 @@ export class EmailService {
 
   // Called when the master order status is updated to notify the client
   public async sendOrderStatusUpdate(order: any): Promise<boolean> {
+    console.log('📧 [EmailService] Sending order status update for order:', order.id, 'status:', order.status);
     return this.sendOrderNotification({
       userEmail: order.userEmail,
       userName: order.userName,
@@ -317,7 +446,14 @@ export class EmailService {
    * Check if EmailJS is properly configured
    */
   public isConfigured(): boolean {
-  return !!this.backendUrl;
+    const configured = !!this.backendUrl && this.isInitialized;
+    console.log('🔍 [EmailService] Configuration check:', {
+      hasBackendUrl: !!this.backendUrl,
+      backendUrl: this.backendUrl,
+      isInitialized: this.isInitialized,
+      configured
+    });
+    return configured;
   }
 }
 
