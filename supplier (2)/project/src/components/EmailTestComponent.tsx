@@ -275,7 +275,7 @@ export const EmailTestComponent: React.FC = () => {
         <div className="mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-200">
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <span className="mr-2">📧</span>
-            Test d'Envoi d'Email
+            Test d'Envoi d\'Email
           </h3>
           
           <div className="mb-4">
