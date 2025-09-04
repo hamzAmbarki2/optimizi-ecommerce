@@ -20,6 +20,13 @@ async function testEmailConfiguration() {
     console.log('2. Set your Gmail address in GMAIL_USER');
     console.log('3. Create a Gmail App Password and set it in GMAIL_APP_PASSWORD');
     console.log('4. Run this test again');
+    console.log('');
+    console.log('🔗 How to create Gmail App Password:');
+    console.log('   1. Go to https://myaccount.google.com/security');
+    console.log('   2. Enable 2-Factor Authentication');
+    console.log('   3. Go to "App passwords" section');
+    console.log('   4. Generate a new app password for "Mail"');
+    console.log('   5. Use the 16-character password (remove spaces)');
     process.exit(1);
   }
 
@@ -27,6 +34,9 @@ async function testEmailConfiguration() {
   console.log('🔧 Creating Gmail transporter...');
   const transporter = nodemailer.createTransporter({
     service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
     auth: {
       user: process.env.GMAIL_USER,
       pass: process.env.GMAIL_APP_PASSWORD
@@ -49,6 +59,8 @@ async function testEmailConfiguration() {
     console.log('2. Enable 2-Factor Authentication on your Gmail account');
     console.log('3. Check that the Gmail address is correct');
     console.log('4. Try generating a new App Password');
+    console.log('5. Make sure the App Password has no spaces');
+    console.log('6. Check if your Gmail account has "Less secure app access" disabled (it should be)');
     process.exit(1);
   }
 
@@ -106,17 +118,32 @@ Optimizi Email Service
     const info = await transporter.sendMail(testEmail);
     console.log('✅ Test email sent successfully!');
     console.log('📧 Message ID:', info.messageId);
+    console.log('📧 Accepted recipients:', info.accepted);
+    if (info.rejected && info.rejected.length > 0) {
+      console.log('⚠️ Rejected recipients:', info.rejected);
+    }
     console.log('📬 Check your inbox:', process.env.GMAIL_USER);
     console.log('');
     console.log('🎉 Email configuration is working correctly!');
   } catch (error) {
     console.error('❌ Failed to send test email:', error.message);
+    
+    if (error.code) {
+      console.error('❌ Error code:', error.code);
+    }
+    if (error.response) {
+      console.error('❌ SMTP response:', error.response);
+    }
+    
     console.log('');
     console.log('💡 Troubleshooting tips:');
     console.log('1. Double-check your Gmail App Password');
     console.log('2. Make sure 2FA is enabled on your Gmail account');
     console.log('3. Try generating a new App Password');
     console.log('4. Check your internet connection');
+    console.log('5. Verify the Gmail address is correct');
+    console.log('6. Check Gmail\'s "Sent" folder to see if emails are being sent');
+    console.log('7. Check spam/junk folders');
   }
 }
 
