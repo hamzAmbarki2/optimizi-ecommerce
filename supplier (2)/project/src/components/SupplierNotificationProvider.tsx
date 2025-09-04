@@ -22,28 +22,40 @@ export const SupplierNotificationProvider: React.FC<SupplierNotificationProvider
     if (currentUser && userData && fournisseur) {
       console.log(`🔄 [SupplierNotificationProvider] Setting up notifications for: ${fournisseur.name} (${fournisseur.id})`);
       
-      // Initialize the notification service
+      // Initialize the enhanced notification service
+      const { supplierNotificationService } = require('../services/supplierNotificationService');
       supplierNotificationService.initialize();
       
       // Check if email service is configured
       const configStatus = supplierNotificationService.getConfigStatus();
       if (!configStatus.isConfigured) {
-        console.warn('⚠️ [SupplierNotificationProvider] Email service not configured:', configStatus.missingFields);
-        console.warn('📧 Please configure VITE_EMAIL_BACKEND_URL in your .env file');
+        console.warn('⚠️ [SupplierNotificationProvider] Enhanced email service not configured:', configStatus.missingFields);
+        console.warn('📧 Please configure the following in your .env file:');
+        console.warn('   - VITE_EMAIL_BACKEND_URL (email backend server URL)');
+        console.warn('   - VITE_SUPPLIER_SUPPORT_EMAIL (your support email)');
+        console.warn('📖 See SUPPLIER_NOTIFICATION_SETUP.md for detailed instructions');
       } else {
-        console.log('✅ [SupplierNotificationProvider] Email service configured successfully');
+        console.log('✅ [SupplierNotificationProvider] Enhanced email service configured successfully');
+        console.log('🔗 [SupplierNotificationProvider] Backend URL:', configStatus.currentValues.backendUrl);
+        console.log('📧 [SupplierNotificationProvider] Support Email:', configStatus.currentValues.supportEmail);
       }
       
-      // Initialize order monitoring for this supplier
+      // Initialize comprehensive order monitoring for this supplier
       const cleanupOrderMonitoring = orderNotificationTrigger.initializeOrderMonitoring(fournisseur.id);
       
       // Cleanup function
       return () => {
-        console.log(`🧹 [SupplierNotificationProvider] Cleaning up notifications for: ${fournisseur.name}`);
+        console.log(`🧹 [SupplierNotificationProvider] Cleaning up comprehensive notifications for: ${fournisseur.name}`);
         cleanupOrderMonitoring();
       };
     } else {
       console.log('⏸️ [SupplierNotificationProvider] Waiting for authentication and supplier data...');
+      console.log('📊 [SupplierNotificationProvider] Current state:', {
+        hasUser: !!currentUser,
+        hasUserData: !!userData,
+        hasFournisseur: !!fournisseur,
+        fournisseurId: fournisseur?.id || 'none'
+      });
     }
   }, [currentUser, userData, fournisseur]);
 

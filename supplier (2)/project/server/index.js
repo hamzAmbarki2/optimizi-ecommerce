@@ -84,16 +84,23 @@ app.get('/health', (req, res) => {
 
 app.post('/send-supplier-email', async (req, res) => {
   try {
-    console.log('📧 [Supplier Email] Received request:', {
+    console.log('📧 [Supplier Email] Received comprehensive request:', {
       to: req.body.to_email,
       subject: req.body.subject,
       hasMessage: !!req.body.message,
+      hasHtmlMessage: !!req.body.html_message,
+      hasOrderMetadata: !!req.body.order_metadata,
+      hasSupplierMetadata: !!req.body.supplier_metadata,
       timestamp: new Date().toISOString()
     });
 
-    const { to_email, subject, message } = req.body;
+    const { to_email, to_name, subject, message, html_message, order_metadata, supplier_metadata } = req.body;
     if (!to_email || !subject || !message) {
-      console.error('❌ [Supplier Email] Missing required fields:', { to_email: !!to_email, subject: !!subject, message: !!message });
+      console.error('❌ [Supplier Email] Missing required fields:', { 
+        to_email: !!to_email, 
+        subject: !!subject, 
+        message: !!message 
+      });
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
@@ -104,40 +111,64 @@ app.post('/send-supplier-email', async (req, res) => {
       return res.status(400).json({ error: 'Invalid email format' });
     }
 
+    // Enhanced mail options with HTML support
     const mailOptions = {
       from: `${process.env.FROM_NAME || 'Optimizi'} <${process.env.GMAIL_USER}>`,
       to: to_email,
       subject,
       text: message,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
-            <h1 style="color: white; margin: 0; text-align: center;">Optimizi - Notification Fournisseur</h1>
+      html: html_message || `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 700px; margin: 0 auto; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); padding: 30px; border-radius: 16px; margin-bottom: 30px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 800;">Optimizi - Notification Fournisseur</h1>
+            <p style="color: #e0e7ff; margin: 15px 0 0 0; font-size: 16px;">Système de notification automatique</p>
           </div>
-          <div style="background: #f8fafc; padding: 20px; border-radius: 10px; border-left: 4px solid #3b82f6;">
-            <pre style="white-space: pre-wrap; font-family: inherit; margin: 0;">${message}</pre>
+          <div style="background: #f8fafc; padding: 30px; border-radius: 16px; border-left: 6px solid #3b82f6; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+            <pre style="white-space: pre-wrap; font-family: inherit; margin: 0; line-height: 1.6; color: #374151;">${message}</pre>
           </div>
-          <div style="text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px;">
-            <p>© 2025 Optimizi. Tous droits réservés.</p>
+          ${order_metadata ? `
+          <div style="background: white; padding: 25px; border-radius: 16px; margin-top: 25px; border: 1px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+            <h3 style="color: #1f2937; margin: 0 0 15px 0; font-size: 18px;">📊 Métadonnées de la Commande</h3>
+            <div style="font-family: 'SF Mono', Monaco, monospace; font-size: 12px; color: #6b7280; background: #f9fafb; padding: 15px; border-radius: 8px;">
+              <div>ID Commande: ${order_metadata.id}</div>
+              <div>Total: TND${order_metadata.total}</div>
+              <div>Articles: ${order_metadata.itemCount}</div>
+              <div>Statut: ${order_metadata.status}</div>
+              <div>Client: ${order_metadata.customerName}</div>
+            </div>
+          </div>
+          ` : ''}
+          <div style="text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; padding: 20px; background: #f9fafb; border-radius: 12px;">
+            <p style="margin: 0 0 10px 0; font-weight: 600;">© 2025 Optimizi. Tous droits réservés.</p>
+            <p style="margin: 0;">Email envoyé automatiquement par le système de notification Optimizi</p>
           </div>
         </div>
-      `
+      `,
+      // Enhanced email headers
+      headers: {
+        'X-Priority': order_metadata?.status === 'pending' ? '1' : '3',
+        'X-MSMail-Priority': order_metadata?.status === 'pending' ? 'High' : 'Normal',
+        'Importance': order_metadata?.status === 'pending' ? 'high' : 'normal'
+      }
     };
 
-    console.log('📧 [Supplier Email] Sending email with options:', {
+    console.log('📧 [Supplier Email] Sending enhanced email with options:', {
       from: mailOptions.from,
       to: mailOptions.to,
       subject: mailOptions.subject,
+      hasHtml: !!mailOptions.html,
+      hasOrderMetadata: !!order_metadata,
       usingRealTransport
     });
 
     const info = await transporter.sendMail(mailOptions);
     
     if (usingRealTransport) {
-      console.log('✅ [Supplier Email] Email sent successfully:', {
+      console.log('✅ [Supplier Email] Enhanced email sent successfully:', {
         messageId: info.messageId,
         accepted: info.accepted,
-        rejected: info.rejected
+        rejected: info.rejected,
+        orderInfo: order_metadata ? `Order ${order_metadata.id} (${order_metadata.status})` : 'No order metadata'
       });
       
       // Log additional details for debugging
@@ -145,12 +176,17 @@ app.post('/send-supplier-email', async (req, res) => {
         console.warn('⚠️ [Supplier Email] Some recipients were rejected:', info.rejected);
       }
     } else {
-      console.log('📝 [Supplier Email] Debug mode - Email logged:', info.message);
+      console.log('📝 [Supplier Email] Debug mode - Enhanced email logged');
+      console.log('📧 [Supplier Email] Subject:', subject);
+      console.log('📧 [Supplier Email] To:', to_email);
+      if (order_metadata) {
+        console.log('📊 [Supplier Email] Order:', order_metadata);
+      }
     }
     
     return res.json({ ok: true, info });
   } catch (error) {
-    console.error('❌ [Supplier Email] Error:', error);
+    console.error('❌ [Supplier Email] Enhanced email error:', error);
     
     // Enhanced error logging
     if (error.code) {
@@ -160,7 +196,11 @@ app.post('/send-supplier-email', async (req, res) => {
       console.error('❌ [Supplier Email] SMTP response:', error.response);
     }
     
-    return res.status(500).json({ error: 'Failed to send email' });
+    return res.status(500).json({ 
+      error: 'Failed to send supplier email',
+      details: error.message,
+      timestamp: new Date().toISOString()
+    });
   }
 });
 

@@ -2,7 +2,7 @@
 
 ## 🚨 Quick Fix Checklist
 
-If emails are not being sent, follow these steps in order:
+If supplier notification emails are not being sent, follow these steps in order:
 
 ### 1. Check Email Server Status
 ```bash
@@ -10,7 +10,7 @@ cd "supplier (2)/project/server"
 npm run debug
 ```
 
-This will test your email configuration step by step.
+This will test your email configuration step by step and verify Gmail connectivity.
 
 ### 2. Verify Gmail App Password Setup
 
@@ -90,23 +90,26 @@ VITE_SUPPLIER_SUPPORT_EMAIL=your-email@gmail.com
    npm run dev
    ```
 
-2. **Start the client frontend**:
-   ```bash
-   cd "client/project"
-   npm run dev
-   ```
-
-3. **Start the supplier frontend**:
+2. **Start the supplier frontend**:
    ```bash
    cd "supplier (2)/project"
    npm run dev
    ```
 
-4. **Test order flow**:
+3. **Test the notification system**:
+   - Navigate to `/email-test` in the supplier dashboard
+   - Run configuration and connection tests
+   - Send a test email to verify functionality
+
+4. **Test with real orders** (if client is also running):
+   ```bash
+   cd "client/project"
+   npm run dev
+   ```
    - Place an order through the client interface
    - Check supplier email for order notification
    - Update order status through supplier interface
-   - Check client email for status update
+   - Verify notifications are sent for status changes
 
 ## 🔧 Common Issues and Solutions
 
@@ -148,6 +151,20 @@ npm install
 PORT=4002 npm run dev
 ```
 
+### Issue 6: Supplier notifications not working but client emails work
+**Cause**: Frontend environment variables not configured
+**Solution**:
+- Check `supplier (2)/project/.env` file exists
+- Verify VITE_EMAIL_BACKEND_URL points to email server
+- Restart supplier frontend after .env changes
+
+### Issue 7: HTML emails not displaying correctly
+**Cause**: Email client compatibility issues
+**Solution**:
+- Test with different email clients (Gmail, Outlook, Apple Mail)
+- Check spam folder settings
+- Verify HTML template syntax in browser first
+
 ## 🧪 Debug Commands
 
 ### Test Email Configuration
@@ -162,19 +179,33 @@ cd "supplier (2)/project/server"
 npm run test
 ```
 
+### Test Supplier Notification System
+```bash
+# In supplier dashboard, navigate to:
+# http://localhost:5173/email-test
+# Run all available tests
+```
+
 ### Check Server Health
 ```bash
 curl http://localhost:4001/health
 ```
 
-### Send Test Email via API
+### Send Test Supplier Email via API
 ```bash
-curl -X POST http://localhost:4001/send-test-email \
+curl -X POST http://localhost:4001/send-supplier-email \
   -H "Content-Type: application/json" \
   -d '{
     "to_email": "test@example.com",
-    "subject": "API Test",
-    "message": "This is a test email via API"
+    "to_name": "Test Supplier",
+    "subject": "🧪 Test Supplier Notification",
+    "message": "This is a test supplier notification email",
+    "order_metadata": {
+      "id": "test123",
+      "total": 50.00,
+      "status": "pending",
+      "customerName": "Test Customer"
+    }
   }'
 ```
 
@@ -183,46 +214,78 @@ curl -X POST http://localhost:4001/send-test-email \
 ```
 Client Places Order
        ↓
-Frontend sends order to Firebase
+Order stored in Firebase (subOrders collection)
        ↓
-Order triggers email notification
+Real-time listener detects order change
        ↓
-Frontend calls email backend API
+Supplier notification service processes order
        ↓
-Node.js server sends email via Gmail SMTP
+Enhanced email content generated with templates
        ↓
-Supplier receives order notification email
+Email sent via Node.js backend (Nodemailer + Gmail)
+       ↓
+Supplier receives comprehensive notification email
+       ↓
+In-app notification created in supplier dashboard
+       ↓
+Event logged for analytics and monitoring
 ```
 
 ## 🔍 Debugging Steps
 
 1. **Check server logs** for error messages
-2. **Verify Gmail credentials** using debug script
-3. **Test email sending** with test script
-4. **Check network connectivity** to Gmail SMTP
-5. **Verify frontend configuration** points to correct backend URL
-6. **Test API endpoints** manually with curl
-7. **Check email delivery** in Gmail sent folder and recipient inbox
+2. **Run supplier notification tests** in `/email-test` dashboard
+3. **Verify Gmail credentials** using debug script
+4. **Test email sending** with comprehensive test script
+5. **Check network connectivity** to Gmail SMTP
+6. **Verify frontend configuration** points to correct backend URL
+7. **Test API endpoints** manually with curl
+8. **Check email delivery** in Gmail sent folder and recipient inbox
+9. **Monitor real-time listeners** in browser console
+10. **Review notification logs** in Firebase console
 
 ## 📞 Still Having Issues?
 
 If you're still experiencing problems:
 
 1. Run the debug script: `npm run debug`
-2. Check the server logs for specific error messages
-3. Verify your Gmail App Password is correct
-4. Try generating a new App Password
-5. Check if your Gmail account has any security restrictions
+2. Test the complete system in `/email-test` dashboard
+3. Check the server logs for specific error messages
+4. Verify your Gmail App Password is correct
+5. Try generating a new App Password
+6. Check if your Gmail account has any security restrictions
+7. Verify both frontend and backend .env files are configured
+8. Test with a different email address to rule out recipient issues
 
 ## 🎯 Success Indicators
 
 You'll know everything is working when:
 - ✅ Debug script shows "EMAIL CONFIGURATION IS WORKING!"
-- ✅ Server logs show "Gmail SMTP transporter verified and ready"
-- ✅ Test emails arrive in your Gmail inbox
-- ✅ Order notifications are received by suppliers
-- ✅ Status update emails are received by clients
+- ✅ Server logs show "Enhanced email service configured successfully"
+- ✅ `/email-test` dashboard shows all green checkmarks
+- ✅ Test emails arrive in your Gmail inbox with professional formatting
+- ✅ Real order notifications are sent automatically to suppliers
+- ✅ In-app notifications appear in supplier dashboard
+- ✅ Notification logs show successful delivery events
+- ✅ Monitoring dashboard shows active listeners and system health
 
+## 🔄 System Health Monitoring
 ---
 
-**Need more help?** Check the server logs and run the debug script for detailed diagnostics.
+### Real-time Monitoring Available
+- **Active listeners** per supplier
+- **Processed order count** tracking
+- **Email delivery success rates**
+- **System health status** indicators
+- **Last activity timestamps**
+
+### Access Monitoring
+- Navigate to `/email-test` in supplier dashboard
+- Check "Statut de la Surveillance" section
+- Review notification statistics and system health
+
+**Need more help?** 
+1. Check the server logs and run the debug script for detailed diagnostics
+2. Use the comprehensive test interface at `/email-test` 
+3. Review the detailed setup guide in `SUPPLIER_NOTIFICATION_SETUP.md`
+4. Monitor system health in real-time through the dashboard
