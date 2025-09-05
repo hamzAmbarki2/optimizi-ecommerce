@@ -86,7 +86,7 @@ const KPIGrid: React.FC<KPIGridProps> = ({ metrics, loading }) => {
     {
       id: 'total-revenue',
       title: 'Total Revenue',
-      value: `${metrics.totalRevenue.toFixed(2)} TND`,
+      value: `TND${metrics.totalRevenue.toFixed(2)}`,
       change: `${metrics.revenueGrowth.toFixed(1)}%`,
       changeType: metrics.revenueGrowth >= 0 ? 'increase' as const : 'decrease' as const,
       icon: <CurrencyDollarIcon className="h-8 w-8 text-white" />,
@@ -110,7 +110,7 @@ const KPIGrid: React.FC<KPIGridProps> = ({ metrics, loading }) => {
     {
       id: 'average-order-value',
       title: 'Avg Order Value',
-      value: `${metrics.averageOrderValue.toFixed(2)} TND`,
+      value: `TND${metrics.averageOrderValue.toFixed(2)}`,
       change: '5%',
       changeType: 'increase' as const,
       icon: <ChartBarIcon className="h-8 w-8 text-white" />,

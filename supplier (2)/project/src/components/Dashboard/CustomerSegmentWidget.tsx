@@ -118,7 +118,7 @@ const CustomerSegmentWidget: React.FC<CustomerSegmentWidgetProps> = ({
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-semibold text-gray-900">{segment.count} customers</p>
-                    <p className="text-xs text-gray-600">{segment.revenue.toFixed(2)} TND</p>
+                    <p className="text-xs text-gray-600">TND{segment.revenue.toFixed(2)}</p>
                   </div>
                 </div>
                 

@@ -86,7 +86,7 @@ const TopProductsWidget: React.FC<TopProductsWidgetProps> = ({ products, loading
               <h4 className="font-semibold text-gray-900 truncate">{product.name}</h4>
               <div className="flex items-center space-x-4 text-sm text-gray-600">
                 <span>{product.sales} sold</span>
-                <span className="font-medium text-green-600">${product.revenue.toFixed(2)}</span>
+                <span className="font-medium text-green-600">TND{product.revenue.toFixed(2)}</span>
               </div>
             </div>
             

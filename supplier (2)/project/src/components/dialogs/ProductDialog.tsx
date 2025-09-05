@@ -297,17 +297,17 @@ const ProductDialog: React.FC<ProductDialogProps> = ({
               <div className="grid grid-cols-3 gap-4 text-sm">
                 <div>
                   <span className="text-gray-600">Price TTC:</span>
-                  <p className="font-semibold">${ProductService.calculatePrices(formData.prixHTVA, formData.tva, '0').prixTTC}</p>
+                  <p className="font-semibold">TND{ProductService.calculatePrices(formData.prixHTVA, formData.tva, '0').prixTTC}</p>
                 </div>
                 <div>
                   <span className="text-gray-600">After Discount:</span>
-                  <p className="font-semibold text-green-600">${ProductService.calculatePrices(formData.prixHTVA, formData.tva, formData.discount).prixAfterDiscount}</p>
+                  <p className="font-semibold text-green-600">TND{ProductService.calculatePrices(formData.prixHTVA, formData.tva, formData.discount).prixAfterDiscount}</p>
                 </div>
                 <div>
                   <span className="text-gray-600">You Save:</span>
                   <p className="font-semibold text-red-600">
-                    ${(parseFloat(ProductService.calculatePrices(formData.prixHTVA, formData.tva, '0').prixTTC) - 
-                       parseFloat(ProductService.calculatePrices(formData.prixHTVA, formData.tva, formData.discount).prixAfterDiscount)).toFixed(3)}
+                    TND{(parseFloat(ProductService.calculatePrices(formData.prixHTVA, formData.tva, '0').prixTTC) - 
+                         parseFloat(ProductService.calculatePrices(formData.prixHTVA, formData.tva, formData.discount).prixAfterDiscount)).toFixed(3)}
                   </p>
                 </div>
               </div>

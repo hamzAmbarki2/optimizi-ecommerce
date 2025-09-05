@@ -65,7 +65,7 @@ const CustomerSegmentDetailModal: React.FC<CustomerSegmentDetailModalProps> = ({
         <div className="bg-white p-3 rounded-xl shadow-lg border border-gray-100">
           <p className="font-semibold text-gray-900">{data.segment}</p>
           <p className="text-blue-600">{data.count} customers</p>
-          <p className="text-green-600">${data.revenue.toFixed(2)}</p>
+          <p className="text-green-600">TND{data.revenue.toFixed(2)}</p>
         </div>
       );
     }

@@ -63,15 +63,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onEdit, onDelete }) 
             <div className="flex items-center space-x-2">
               {hasDiscount ? (
                 <>
-                  <p className="text-lg font-bold text-green-600">${product.prixAfterDiscount}</p>
-                  <p className="text-sm text-gray-500 line-through">${product.prixTTC}</p>
+                  <p className="text-lg font-bold text-green-600">TND{product.prixAfterDiscount}</p>
+                  <p className="text-sm text-gray-500 line-through">TND{product.prixTTC}</p>
                 </>
               ) : (
-                <p className="text-2xl font-bold text-gray-900">${product.prixTTC}</p>
+                <p className="text-2xl font-bold text-gray-900">TND{product.prixTTC}</p>
               )}
             </div>
             <p className="text-xs text-gray-500">
-              HT: ${product.prixHTVA} | TVA: {product.tva}%
+              HT: TND{product.prixHTVA} | TVA: {product.tva}%
             </p>
             <p className="text-sm text-gray-500">Stock: {product.stockQuantity} {product.unit}</p>
           </div>

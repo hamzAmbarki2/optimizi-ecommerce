@@ -233,7 +233,7 @@ const Dashboard: React.FC = () => {
                       {order.userName}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-                      {order.total?.toFixed(2)} TND
+                      TND{order.total?.toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${

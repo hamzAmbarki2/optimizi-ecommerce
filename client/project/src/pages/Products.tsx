@@ -162,6 +162,12 @@ export default function Products() {
             <span>Affichage de {filteredProducts.length} produits</span>
           </div>
         </div>
+        <FilterSidebar
+          isOpen={isFilterOpen}
+          onClose={() => setIsFilterOpen(false)}
+          filters={filters}
+          onFiltersChange={handleFiltersChange}
+        />
 
         <div className="flex gap-8">
           {/* Barre latérale pour ordinateur */}
