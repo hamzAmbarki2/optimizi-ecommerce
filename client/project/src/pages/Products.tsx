@@ -165,7 +165,7 @@ export default function Products() {
 
         <div className="flex gap-8">
           {/* Barre latérale pour ordinateur */}
-          <div className="hidden lg:block w-64">
+          <div className="hidden lg:block w-64 flex-shrink-0">
             <FilterSidebar
               isOpen={true}
               onClose={() => {}}
@@ -175,7 +175,7 @@ export default function Products() {
           </div>
 
           {/* Grille de produits */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             {filteredProducts.length === 0 ? (
               <div className="text-center py-12">
                 <div className="text-gray-400 mb-4">

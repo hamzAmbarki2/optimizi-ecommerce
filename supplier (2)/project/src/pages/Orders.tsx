@@ -275,10 +275,11 @@ const Orders: React.FC = () => {
     const pending = orders.filter(o => o.status === 'pending').length;
     const confirmed = orders.filter(o => o.status === 'confirmed').length;
     const preparing = orders.filter(o => o.status === 'preparing').length;
-    const outForDelivery = orders.filter(o => o.status === 'out_for_delivery').length;
+    const processing = orders.filter(o => o.status === 'confirmed' || o.status === 'preparing').length;
+    const shipped = orders.filter(o => o.status === 'out_for_delivery').length;
     const delivered = orders.filter(o => o.status === 'delivered').length;
     
-    return { total, pending, confirmed, preparing, outForDelivery, delivered };
+    return { total, pending, processing, shipped, delivered };
   };
 
   const stats = getOrderStats();
@@ -351,8 +352,8 @@ const Orders: React.FC = () => {
 
         <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
           <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-xl">
-              <ExclamationTriangleIcon className="h-6 w-6 text-blue-600" />
+            <div className="p-2 bg-orange-100 rounded-xl">
+              <ExclamationTriangleIcon className="h-6 w-6 text-orange-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Processing</p>
@@ -514,7 +515,7 @@ const Orders: React.FC = () => {
                       <div className="flex items-center">
                         <ShoppingBagIcon className="h-4 w-4 mr-1" />
                         {order.items?.length || 0} items
-                      </div>
+                      TND{order.total?.toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">${order.total?.toFixed(2)}</div>
@@ -717,7 +718,8 @@ const Orders: React.FC = () => {
                             </div>
                             <div>
                               <span className="font-medium">Unit Price:</span> ${item.unitPrice?.toFixed(2)}
-                            </div>
+                              <span className="font-medium">Unit Price:</span> TND{item.unitPrice?.toFixed(2)}
+                            <p className="text-lg font-bold text-gray-900">TND{item.totalPrice?.toFixed(2)}</p>
                           </div>
                         </div>
                         <div className="text-right flex-shrink-0">
@@ -737,20 +739,20 @@ const Orders: React.FC = () => {
                   <div className="bg-white rounded-2xl p-6 space-y-4">
                     <div className="flex justify-between text-gray-600">
                       <span>Subtotal:</span>
-                      <span>${selectedOrder.subtotal?.toFixed(2)}</span>
+                      <span>TND{selectedOrder.subtotal?.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-gray-600">
                       <span>Delivery Fee:</span>
-                      <span>${selectedOrder.deliveryFee?.toFixed(2)}</span>
+                      <span>TND{selectedOrder.deliveryFee?.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-gray-600">
                       <span>Tax:</span>
-                      <span>${selectedOrder.tax?.toFixed(2)}</span>
+                      <span>TND{selectedOrder.tax?.toFixed(2)}</span>
                     </div>
                     <div className="border-t border-gray-200 pt-4">
                       <div className="flex justify-between text-xl font-bold text-gray-900">
                         <span>Total:</span>
-                        <span>${selectedOrder.total?.toFixed(2)}</span>
+                        <span>TND{selectedOrder.total?.toFixed(2)}</span>
                       </div>
                     </div>
                   </div>

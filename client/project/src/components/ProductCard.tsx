@@ -257,7 +257,7 @@ export default function ProductCard({ product, showCategory = false, variant = '
               <span className="text-sm text-neutral-600 dark:text-neutral-400">par {product.unit}</span>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 flex-shrink-0">
               {isInCart && (
                 <div className="flex items-center gap-1.5 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 text-green-700 dark:text-green-300 px-3 py-1.5 rounded-full text-sm font-medium border border-green-200 dark:border-green-800">
                   <ShoppingCart className="w-3.5 h-3.5" />
@@ -268,11 +268,10 @@ export default function ProductCard({ product, showCategory = false, variant = '
               <button
                 onClick={handleAddToCart}
                 disabled={product.stockQuantity === 0}
-                className="px-5 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-medium rounded-soft shadow-soft hover:shadow-glow transform hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-medium rounded-soft shadow-soft hover:shadow-glow transform hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex-shrink-0"
               >
                 <ShoppingCart className="w-4 h-4" />
-                <span className="hidden sm:inline">{product.stockQuantity === 0 ? 'Rupture de stock' : isInCart ? 'Ajouter plus' : 'Ajouter'}</span>
-                <span className="sm:hidden">+</span>
+                <span className="text-sm">{product.stockQuantity === 0 ? 'Rupture' : isInCart ? '+' : 'Ajouter'}</span>
               </button>
             </div>
           </div>

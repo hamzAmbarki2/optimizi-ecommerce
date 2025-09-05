@@ -54,15 +54,15 @@ export default function FilterSidebar({ isOpen, onClose, filters, onFiltersChang
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm"
           onClick={onClose}
         />
       )}
       
       <div className={`
-        fixed lg:sticky top-0 left-0 h-full lg:h-auto w-80 bg-white dark:bg-gray-800 shadow-xl z-50 transform transition-transform duration-300
+        fixed lg:sticky top-0 left-0 h-full lg:h-auto w-80 lg:w-64 bg-white dark:bg-gray-800 shadow-xl z-50 transform transition-transform duration-300
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        lg:w-64 lg:shadow-lg lg:rounded-2xl p-6
+        lg:shadow-lg lg:rounded-2xl p-6 lg:max-h-screen lg:overflow-y-auto
       `}>
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-bold text-gray-800 dark:text-white flex items-center">
@@ -164,13 +164,13 @@ export default function FilterSidebar({ isOpen, onClose, filters, onFiltersChang
         <div className="mt-8 space-y-3">
           <button
             onClick={applyFilters}
-            className="w-full px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all"
+            className="w-full px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all lg:sticky lg:bottom-4"
           >
             Appliquer les filtres
           </button>
           <button
             onClick={clearFilters}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             Réinitialiser
           </button>
