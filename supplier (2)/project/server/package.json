@@ -1,0 +1,22 @@
+{
+  "name": "optimizi-supplier-email-backend",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "node test-email.js",
+    "debug": "node debug-email.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "nodemailer": "^6.9.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "helmet": "^7.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
