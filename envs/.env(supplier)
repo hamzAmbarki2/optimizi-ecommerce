@@ -1,0 +1,11 @@
+# Email Backend Configuration for Supplier Notifications
+# This points to your Node.js email server (Nodemailer backend)
+
+# Email Backend URL (where your Node.js email server is running)
+VITE_EMAIL_BACKEND_URL=http://localhost:4001
+
+# Supplier support email (where you want to receive support emails)
+VITE_SUPPLIER_SUPPORT_EMAIL=hamza.mbarki2002@gmail.com
+
+# Alternative for production (replace with your actual domain)
+# VITE_EMAIL_BACKEND_URL=https://your-domain.com/api
